@@ -70,6 +70,21 @@ class ProdutoModel {
             return await conexao.ExecutaComandoNonQuery(sql, valores) > 0;
         }
     }
+    async atualizaEstoque(id,novaQuantidade){
+        let sql ="update tb_produto set prd_quantidade = ? where prd_id = ?"
+        let valor=[novaQuantidade,id];
+        return await conexao.ExecutaComandoNonQuery(sql,valor);
+
+    }
+    async buscarQuantidade(id){
+        let sql ="select prd_quantidade from tb_produto where prd_id = ?"
+        let valor=[id];
+        var rows = await conexao.ExecutaComando(sql,valor);
+
+        let qntd =rows[0].prd_quantidade;
+
+        return qntd;
+    }
 
     async buscarProduto(id){
         let sql = 'select * from tb_produto where prd_id = ? order by prd_id';

@@ -79,6 +79,8 @@ class PedidoItemModel {
         return listaItens;
     }
 
+
+
     async gravar() {
         let sql = "insert into tb_pedidoitens (ped_id, prd_id, pit_quantidade, pit_valorunidade, pit_valortotal) values (?, ?, ?, ?, ?)";
 
@@ -88,6 +90,7 @@ class PedidoItemModel {
 
         return result;
     }
+
 }
 
 module.exports = PedidoItemModel;

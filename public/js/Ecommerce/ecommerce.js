@@ -6,7 +6,8 @@ document.addEventListener("DOMContentLoaded", function() {
         let carrinhoSerializado = localStorage.getItem("carrinho");
         carrinho = JSON.parse(carrinhoSerializado);
     }
-    document.getElementById("btnConfirmar").addEventListener("click",gravar);
+    document.getElementById("btnConfirmar").addEventListener("click",gravar);///chama a gravar
+
     let contador = document.getElementById("contadorCarrinho");
 
     contador.innerText = carrinho.length;
@@ -28,7 +29,10 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("valorTotal").innerHTML = `<h3>Valor total: R$ ${soma}</h3`;
     }
     function gravar(){
+
+
         if(carrinho.length>0){
+            //aqui vem as validaçoes ent antes do fetch 
             fetch("/pedido/gravar",{
                 method:"POST",
                 headers:
