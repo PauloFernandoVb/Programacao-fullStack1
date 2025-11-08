@@ -8,6 +8,7 @@ const categoriaRoute = require('./routes/categoriaRoute');
 const usuarioRoute = require("./routes/usuarioRoute");
 const perfilRoute = require('./routes/perfilRoute');
 const loginRoute = require("./routes/loginRoute");
+const pedido=require("./routes/pedidosRoute");
 const cookieParser = require("cookie-parser");
 const AuthMiddleware = require('./middlewares/authMiddleware');
 const app = express();
@@ -30,6 +31,7 @@ app.use(cookieParser());
 app.use("/login", loginRoute);
 app.use('/', homeRoute);
 app.use('/produto', produtoRoute);
+app.use('/pedido',pedido);
 
 let auth = new AuthMiddleware();
 
