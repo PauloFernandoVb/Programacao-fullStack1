@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
         let carrinhoSerializado = localStorage.getItem("carrinho");
         carrinho = JSON.parse(carrinhoSerializado);
     }
-
+    document.getElementById("btnConfirmar").addEventListener("click",gravar);
     let contador = document.getElementById("contadorCarrinho");
 
     contador.innerText = carrinho.length;
@@ -26,6 +26,26 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         document.getElementById("valorTotal").innerHTML = `<h3>Valor total: R$ ${soma}</h3`;
+    }
+    function gravar(){
+        if(carrinho.length>0){
+            fetch("/pedido/gravar",{
+                method:"POST",
+                headers:
+                {
+                    "Content-Type":"application/json"
+                },
+                    body:JSON.stringify(carrinho)
+            })
+            .then(function(resposta){
+                return resposta.json();
+            })
+            .then(function(corpo){
+                console.log(corpo)
+            })
+        }else{
+            alert("carrinho Vazio")
+        }
     }
 
     function renderCarrinho() {
