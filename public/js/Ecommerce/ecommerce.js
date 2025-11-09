@@ -1,12 +1,12 @@
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 
     let carrinho = [];
-    if(localStorage.getItem("carrinho") != null) {
+    if (localStorage.getItem("carrinho") != null) {
         let carrinhoSerializado = localStorage.getItem("carrinho");
         carrinho = JSON.parse(carrinhoSerializado);
     }
-    document.getElementById("btnConfirmar").addEventListener("click",gravar);///chama a gravar
+    document.getElementById("btnConfirmar").addEventListener("click", gravar);///chama a gravar
 
     let contador = document.getElementById("contadorCarrinho");
 
@@ -16,38 +16,39 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.addEventListener("show.bs.modal", renderCarrinho);
 
-    for(let i = 0; i<btns.length; i++) {
+    for (let i = 0; i < btns.length; i++) {
         btns[i].addEventListener("click", adicionarAoCarrinho);
     }
 
     function calcularValorCarrinho() {
         let soma = 0;
-        for(let item of carrinho) {
+        for (let item of carrinho) {
             soma += (item.quantidade * item.preco);
         }
 
         document.getElementById("valorTotal").innerHTML = `<h3>Valor total: R$ ${soma}</h3`;
     }
-    function gravar(){
+
+    function gravar() {
 
 
-        if(carrinho.length>0){
+        if (carrinho.length > 0) {
             //aqui vem as validaçoes ent antes do fetch 
-            fetch("/pedido/gravar",{
-                method:"POST",
+            fetch("/pedido/gravar", {
+                method: "POST",
                 headers:
                 {
-                    "Content-Type":"application/json"
+                    "Content-Type": "application/json"
                 },
-                    body:JSON.stringify(carrinho)
+                body: JSON.stringify(carrinho)
             })
-            .then(function(resposta){
-                return resposta.json();
-            })
-            .then(function(corpo){
-                console.log(corpo)
-            })
-        }else{
+                .then(function (resposta) {
+                    return resposta.json();
+                })
+                .then(function (corpo) {
+                    console.log(corpo)
+                })
+        } else {
             alert("carrinho Vazio")
         }
     }
@@ -55,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function renderCarrinho() {
         let html = "";
 
-        if(carrinho.length > 0) {
+        if (carrinho.length > 0) {
 
             //cabecalho da tabela
             html = `<table class="table table-striped">
@@ -71,20 +72,20 @@ document.addEventListener("DOMContentLoaded", function() {
                         </thead>
                         <tbody>`;
 
-            for(let i = 0; i<carrinho.length; i++) {
-                    html += `<tr>
+            for (let i = 0; i < carrinho.length; i++) {
+                html += `<tr>
                                 <td><img src="${carrinho[i].imagem}" width="80" /></td>                     
                                 <td>${carrinho[i].nome}</td>
                                 <td>
                                     <div style="display:flex;justify-content:space-evenly;">
-                                        <button class="btn btn-light"><i class="fas fa-plus"></i></button>
-                                        <input style="width:70px;" class="form-control" type="text" value="${carrinho[i].quantidade}" />
-                                        <button class="btn btn-light"><i class="fas fa-minus"></i></button>
+                                        <button class="btn btn-light" ><i class="fas fa-plus"></i></button>
+                                        <input style="width:70px;" class="form-control"  type="text" value="${carrinho[i].quantidade}" />
+                                        <button class="btn btn-light" ><i class="fas fa-minus"></i></button>
                                     </div>
                                 </td>
                                 <td>R$ ${carrinho[i].preco}</td>
                                 <td>R$ ${carrinho[i].quantidade * carrinho[i].preco}</td>
-                                <td><button class="btn btn-danger"><i class="fas fa-trash"></i></button></td>
+                                <td><button class="btn btn-danger btn_del" data-produto="${carrinho[i].id}" ><i class="fas fa-trash"></i></button></td>
                             </tr>`;
             }
 
@@ -93,6 +94,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
             document.querySelector(".modal-body").innerHTML = html;
             calcularValorCarrinho();
+
+            document.querySelectorAll(".btn_del").forEach(botao => {
+                botao.addEventListener("click", deletar);
+            })
         }
         else {
             html = "Carrinho vazio!";
@@ -100,35 +105,47 @@ document.addEventListener("DOMContentLoaded", function() {
 
     }
 
+    function deletar() {
+        let itemDel = this.dataset.produto; //é o data set do botao delete q vem para ca
+        for (let i = 0; i < carrinho.length; i++) {
+            if (itemDel == carrinho[i].id) { //compara os id do vetor e tira qui
+                carrinho.splice(i, 1)
+            }
+        }
+        localStorage.setItem("carrinho", JSON.stringify(carrinho));
+        renderCarrinho();
+    }
+
+
     function adicionarAoCarrinho() {
-       let produtoId = this.dataset.produto;
-       let that = this; 
-       //fetch para buscar as informações do produto;
-       fetch("/produto/obter/" + produtoId)
-       .then(function(cabecalho) {
-            return cabecalho.json();
-       })
-       .then(function(corpo) {
-            let produto = corpo.produto;
-            //adiciona o produto no localStorage
-            //antes de adicionar, verificar se o produto já existe;
-            let produtoCarrinho = carrinho.filter(x => x.id == produto.id);
-            if(produtoCarrinho.length == 0) { //nao encontrei, adiciona
-                //inicializa a quantidade com 1;
-                produto.quantidade = 1;
-                carrinho.push(produto);
-            }
-            else { //encontrei, incrementa a quantidade
+        let produtoId = this.dataset.produto;
+        let that = this;
+        //fetch para buscar as informações do produto;
+        fetch("/produto/obter/" + produtoId)
+            .then(function (cabecalho) {
+                return cabecalho.json();
+            })
+            .then(function (corpo) {
+                let produto = corpo.produto;
+                //adiciona o produto no localStorage
+                //antes de adicionar, verificar se o produto já existe;
+                let produtoCarrinho = carrinho.filter(x => x.id == produto.id);
+                if (produtoCarrinho.length == 0) { //nao encontrei, adiciona
+                    //inicializa a quantidade com 1;
+                    produto.quantidade = 1;
+                    carrinho.push(produto);
+                }
+                else { //encontrei, incrementa a quantidade
 
-                produtoCarrinho[0].quantidade += 1;
-            }
+                    produtoCarrinho[0].quantidade += 1;
+                }
 
-            localStorage.setItem("carrinho", JSON.stringify(carrinho));
-            contador.innerText = carrinho.length;
-            that.innerHTML = "<i class='fas fa-check'></i> Produto Adicionado!";
-            setTimeout(function() {
-                that.innerHTML = `<i class="bi-cart-fill me-1"></i> Adicionar ao carrinho`
-            }, 3000)
-       })
+                localStorage.setItem("carrinho", JSON.stringify(carrinho));
+                contador.innerText = carrinho.length;
+                that.innerHTML = "<i class='fas fa-check'></i> Produto Adicionado!";
+                setTimeout(function () {
+                    that.innerHTML = `<i class="bi-cart-fill me-1"></i> Adicionar ao carrinho`
+                }, 3000)
+            })
     }
 })

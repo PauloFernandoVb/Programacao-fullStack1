@@ -62,6 +62,7 @@ class PedidosController {
 
                 }
                 await pedidoModel.atualizaValores(pedidoValortotal, pedidoId);
+                console.log(pedidoValortotal)
                 //===========================================//
             } else {
                 ok = false;
