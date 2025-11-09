@@ -76,6 +76,7 @@ class ProdutoModel {
         return await conexao.ExecutaComandoNonQuery(sql,valor);
 
     }
+    
     async buscarQuantidade(id){
         let sql ="select prd_quantidade from tb_produto where prd_id = ?"
         let valor=[id];
