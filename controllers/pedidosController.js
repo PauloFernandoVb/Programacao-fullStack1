@@ -6,10 +6,8 @@ class PedidosController {
     async gravar(req, res) {
         console.log(req.body);//ver se as informaçoes chegam pelo botao gravar
         let ok = false;
-        let msg = "";
 
-
-            let mensagens=[];
+        let mensagens = [];
         if (req.body.length > 0) {
             //para testar as validaçoes do corpo se esta vindo alguma coisa se o id esta correto eesa variavel ja retona oque contem no carrinho 
             let itensPedido = req.body;
@@ -21,58 +19,57 @@ class PedidosController {
                 //para validar item a item
                 //===========================================//
                 //BUSCA E VALIDAÇAO DO ESTOQUE:
+                let pedidoValortotal = 0;
                 for (var i = 0; i < itensPedido.length; i++) {
                     let produtoId = itensPedido[i].id;
                     let produtoEncontrado = await produtoModel.buscarProduto(produtoId);
+
+                    if (produtoEncontrado == null) {
+                        mensagens.push(`produto com ID ${produtoId} nao encontrado — `);
+                        continue;
+                    }
                     if (produtoEncontrado != null) {
                         let quantidade = await produtoModel.buscarQuantidade(produtoId);
                         console.log(quantidade);//funcionou mostrou a quantidade do estoque
 
                         if (quantidade >= itensPedido[i].quantidade) {
                             //pus aqui dentro o segundo for caso as quantidades fossem iguais davaum i++
-
-                             //for (let i = 0; i < itensPedido.length; i++) {
+                            //for (let i = 0; i < itensPedido.length; i++) {
                             //     let produtoId = itensPedido[i].id;
                             //     let produtoEncontrado = await produtoModel.buscarProduto(produtoId);//busca o id
-                                // if (produtoEncontrado != null) {
-                                    //o produto existe
-                                    let itemPedidoModel = new PedidoItemModel();
-                                    itemPedidoModel.produtoId = produtoId;
-                                    itemPedidoModel.pedidoId = pedidoId;
-                                    itemPedidoModel.pedidoItemValor = produtoEncontrado.produtoPreco;
-                                    itemPedidoModel.pedidoItemQuantidade = itensPedido[i].quantidade;
-                                    itemPedidoModel.pedidoItemValorTotal = produtoEncontrado.produtoPreco * itensPedido[i].quantidade;
+                            // if (produtoEncontrado != null) {
+                            //o produto existe
+                            let itemPedidoModel = new PedidoItemModel();
+                            itemPedidoModel.produtoId = produtoId;
+                            itemPedidoModel.pedidoId = pedidoId;
+                            itemPedidoModel.pedidoItemValor = produtoEncontrado.produtoPreco;
+                            itemPedidoModel.pedidoItemQuantidade = itensPedido[i].quantidade;
+                            itemPedidoModel.pedidoItemValorTotal = produtoEncontrado.produtoPreco * itensPedido[i].quantidade;
 
-                                    await itemPedidoModel.gravar();
-                                    //gera o pedido e o item 
-                                    ok = true;
-                                    mensagens.push(`Item ${produtoEncontrado.produtoNome} adicionado no Pedido     `);
-                                    await produtoModel.atualizaEstoque(produtoId, quantidade - itensPedido[i].quantidade)
+                            await itemPedidoModel.gravar();
+                            //gera o pedido e o item 
+                            ok = true;
+                            mensagens.push(`Item ${produtoEncontrado.produtoNome} adicionado no Pedido     `);
+                            await produtoModel.atualizaEstoque(produtoId, quantidade - itensPedido[i].quantidade);
 
-                               } else{
-                                    ok = false;
-                                    mensagens.push(`a quantidade do prduto ${produtoEncontrado.produtoNome} é insulficiente  `);
-                                }
-                            
-                            
-                        
+                            pedidoValortotal +=itemPedidoModel.pedidoItemValorTotal;//tem que por o itempedidomodel
+
+                        } else {
+                            ok = false;
+                            mensagens.push(`a quantidade do prduto ${produtoEncontrado.produtoNome} é insulficiente  `);
+                        }
                     }
+
                 }
+                await pedidoModel.atualizaValores(pedidoValortotal, pedidoId);
                 //===========================================//
-
-
-
             } else {
                 ok = false;
-                msg = "erro ao gerar pedido!";
+                msg = "nao ha produtos no carrinho"
             }
 
-        } else {
-            ok = false;
-            msg = "nao ha produtos no carrinho"
+            res.send({ ok: ok, msg: mensagens.join(" | ") });
         }
-
-        res.send({ ok: ok, msg: mensagens.join(" | ") });
     }
 }
 module.exports = PedidosController;

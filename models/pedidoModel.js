@@ -6,6 +6,14 @@ class PedidoModel {
 
     #pedidoId;
     #pedidoData;
+    #pedidoValorTotal
+
+    get pedidoValorTotal(){
+        return this.#pedidoValorTotal;
+    }
+    set pedidoValorTotal(pedidoValorTotal){
+        this.pedidoValorTotal=pedidoValorTotal;
+    }
 
     get pedidoId() {
         return this.#pedidoId;
@@ -21,9 +29,10 @@ class PedidoModel {
         this.#pedidoData = pedidoData;
     }
 
-    constructor(pedidoId, pedidoData) {
+    constructor(pedidoId, pedidoData,pedidoValorTotal) {
         this.#pedidoId = pedidoId;
         this.#pedidoData = pedidoData;
+        this.#pedidoValorTotal=pedidoValorTotal;
     }
 
     async listar() {
@@ -52,6 +61,11 @@ class PedidoModel {
         return result;// aqui é aquele id para fazer as incerssoes dos itens do pedido
 
         //É QUANDO O INSERT DO ITEN DEPENDE DO INSERT DO PEDIDO AI USA ESSA FUNCTION
+    }
+    async atualizaValores(valortotal,id){
+        let sql = "update tb_pedido set ped_valortotal = ? where ped_id = ? "
+        let valores=[valortotal,id];
+        return await banco.ExecutaComandoNonQuery(sql,valores);
     }
 
 }
