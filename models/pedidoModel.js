@@ -65,7 +65,7 @@ class PedidoModel {
     async atualizaValores(valortotal,id){
         let sql = "update tb_pedido set ped_valortotal = ? where ped_id = ? "
         let valores=[valortotal,id];
-        return await banco.ExecutaComandoNonQuery(sql,valores);
+        return await banco.ExecutaComandoNonQuery(sql,valores);// valor no banco apenas
     }
 
 }
