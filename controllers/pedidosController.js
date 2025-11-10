@@ -30,7 +30,7 @@ class PedidosController {
                     }
                     if (produtoEncontrado != null) {
                         let quantidade = await produtoModel.buscarQuantidade(produtoId);
-                        console.log(quantidade);//funcionou mostrou a quantidade do estoque
+                        console.log(`quantidade do produto:${produtoId} no estoque: ${quantidade}`);//funcionou mostrou a quantidade do estoque
 
                         if (quantidade >= itensPedido[i].quantidade) {
                             //pus aqui dentro o segundo for caso as quantidades fossem iguais davaum i++
@@ -62,7 +62,7 @@ class PedidosController {
 
                 }
                 await pedidoModel.atualizaValores(pedidoValortotal, pedidoId);
-                console.log(pedidoValortotal)
+                console.log(`Valor total do carrinho R$:${pedidoValortotal},00`);
                 //===========================================//
             } else {
                 ok = false;
