@@ -3,6 +3,17 @@ const PedidoModel = require("../models/pedidoModel");
 const ProdutoModel = require("../models/produtoModel");
 
 class PedidosController {
+
+    async pedidosView(req, res) {
+        res.render("pedido/listar");//montar a tabela para listalas
+    }
+    async listarPedidos(req, res) {
+        let pedidoItem = new PedidoModel();
+        let lista = await pedidoItem.listar();
+        res.send({ lista });//aqui so envia e nao renderiza pois sera feita em duas etapas
+    }
+
+
     async gravar(req, res) {
         console.log(req.body);//ver se as informaçoes chegam pelo botao gravar
         let ok = false;
@@ -52,11 +63,12 @@ class PedidosController {
                             mensagens.push(`Item ${produtoEncontrado.produtoNome} adicionado no Pedido     `);
                             await produtoModel.atualizaEstoque(produtoId, quantidade - itensPedido[i].quantidade);
 
-                            pedidoValortotal +=itemPedidoModel.pedidoItemValorTotal;//tem que por o itempedidomodel
+                            pedidoValortotal += itemPedidoModel.pedidoItemValorTotal;//tem que por o itempedidomodel
 
                         } else {
                             ok = false;
                             mensagens.push(`a quantidade do prduto ${produtoEncontrado.produtoNome} é insulficiente  `);
+                            alert(``);
                         }
                     }
 
