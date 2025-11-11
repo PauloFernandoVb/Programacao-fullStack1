@@ -135,7 +135,6 @@ class ProdutoModel {
                 // if(row["prd_imagem"] != null) {
                 //     imagemBase64 = "data:image/png;base64," + row["prd_imagem"].toString("base64");
                 // }
-
                 //armazenamento em diretório
                 let imagem = "";
                 if (row["prd_imagem"] != null
@@ -157,7 +156,8 @@ class ProdutoModel {
         return listaRetorno;
     }
 
-    toJSON() {
+    toJSON() {//pega os atributos privados solicita do cliente para o server e esses dados saiam do servidor para o cliente atraves desse JSON; 
+        //
         return {
             id: this.#produtoId,
             nome: this.#produtoNome,
