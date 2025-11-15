@@ -78,8 +78,8 @@ class PedidoItemModel {
     }
 
 
-    constructor(pedidodoItemId, pedidoId, produtoId, 
-        pedidoItemQuantidade, pedidoItemValor, 
+    constructor(pedidodoItemId, pedidoId, produtoId,
+        pedidoItemQuantidade, pedidoItemValor,
         pedidoItemValorTotal, pedidoData, pedidoValorTotal, produtoNome) {
         this.#pedidodoItemId = pedidodoItemId;
         this.#pedidoId = pedidoId;
@@ -91,14 +91,28 @@ class PedidoItemModel {
         this.#pedidoValorTotal = pedidoValorTotal;
         this.#produtoNome = produtoNome;
     }
+    // com a funçao usaremos esse sql e modificando ele para filtrar 
+    async listar(termoFiltragem) {//PASSAREMOS DOIS TERMOS PRE FIXADOS PRA MONTAR O WHERE DE MANEIRA DIFERENTE 
 
-    async listar() {
+        let sqlWhere = "";
+        if (termoFiltragem) {
+            if (isNaN(termoFiltragem)) {//se for verdade nao é um numero ele é o nome, se for falso é o id do pedido
+                //sql para filtrar o nome
+                sqlWhere = " where pr.prd_nome like '%" + termoFiltragem + "%' "; //ASPAS SIMPLES ANTES E DPS DA %
+            } else {
+                //sql para filtrar o nmr do pedido // ESTA NA LISTAR DA PUBLIC A PASSAGEM OPCIONAL AS QUERY STRING
+                sqlWhere = " where p.ped_id =" + termoFiltragem;
+            }
+        }
         let sql = `select p.ped_id, p.ped_data, p.ped_valortotal, 
                     i.pit_quantidade, 
                     i.pit_valorunidade, i.pit_valortotal, pr.prd_nome
                     from tb_pedido p 
                     inner join tb_pedidoitens i on p.ped_id = i.ped_id
-                    inner join tb_produto pr on pr.prd_id = i.prd_id`;
+                    inner join tb_produto pr on pr.prd_id = i.prd_id 
+                    ${sqlWhere}
+                    order by p.ped_data desc`
+            ;
 
         let valores = [];
 
@@ -106,7 +120,7 @@ class PedidoItemModel {
 
         let listaItens = [];
 
-        for(let i = 0; i< rows.length; i++) {
+        for (let i = 0; i < rows.length; i++) {
             let row = rows[i];
             listaItens.push(new PedidoItemModel(0, row["ped_id"], 0, row["pit_quantidade"], row["pit_valorunidade"], row["pit_valortotal"], row["ped_data"], row["ped_valortotal"], row["prd_nome"]));
         }

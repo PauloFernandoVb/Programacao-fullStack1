@@ -6,11 +6,19 @@ class PedidosController {
 
     async pedidosView(req, res) {
         res.render("pedido/listar");//montar a tabela para listalas
+
     }
-        async listarPedidos(req, res) {
+
+    //metodo de passegem opcional de parametro pois o cliente pode nao fazer nenhuma filtragem 
+
+    async listarPedidos(req, res) {
+        let termo = null;
+        if (req.query.termo) {
+            termo = req.query.termo;
+        }
         let pedidoItem = new PedidoItemModel();
-        let lista = await pedidoItem.listar();
-        res.send({lista});//aqui so envia e nao renderiza pois sera feita em duas etapas
+        let lista = await pedidoItem.listar(termo);
+        res.send({ lista });//aqui so envia e nao renderiza pois sera feita em duas etapas
     }
 
 

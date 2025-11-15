@@ -47,6 +47,6 @@ global.CAMINHO_IMG = "/img/produtos/";
 global.CAMINHO_IMG_ABS = __dirname + "/public/img/produtos/";
 
 //ponto de inicio do nosso servidor web
-const server = app.listen('5500', function() {
+const server = app.listen('5000', function() {
     console.log('Servidor web iniciado');
 });
